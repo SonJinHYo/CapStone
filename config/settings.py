@@ -31,11 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 CUSTOM_APPS = [
-    "regions.apps.RegionsConfig",
     "medias.apps.MediasConfig",
+    "cctvs.apps.CCTVsConfig",
+    "violations.apps.ViolationsConfig",
 ]
 
-BASED_APPS = [
+SYSTEM_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,7 +45,7 @@ BASED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-INSTALLED_APPS = BASED_APPS + CUSTOM_APPS
+INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
