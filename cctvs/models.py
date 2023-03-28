@@ -7,33 +7,26 @@ class CCTV(models.Model):
 
     Fields
         name (CharField) : 모델명
-        law (CharField) : 위반 사항에 대한 법률
+        region (CharField) : 설치 지역
+        description (TextField) : 상세 주소 및 추가 설명
     """
 
     name = models.CharField(
         max_length=50,
         verbose_name="모델명",
     )
-    region = models.ForeignKey(
-        "cctvs.Region",
-        verbose_name="설치지역",
-        on_delete=models.SET_NULL,
+    region = models.CharField(
+        max_length=50,
+        verbose_name="감시 지역",
+    )
+    description = models.TextField(
+        verbose_name="상세 주소 / 추가 설명",
+        blank=True,
         null=True,
     )
 
-
-class Region(models.Model):
-    """Region Model Description
-
-    Fields
-        name (CharField) : 지역명
-        description (TextField) : 상세주소
-    """
-
-    name = models.CharField(
-        max_length=50,
-        verbose_name="지역명",
-    )
-    description = models.TextField(
-        verbose_name="상세 주소",
-    )
+    def __str__(self) -> str:
+        if len(self.description) > 15:
+            return f"{self.region} / {self.description[:15]}..."
+        else:
+            return f"{self.region} / {self.description}"
