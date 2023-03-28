@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 CUSTOM_APPS = [
+    "users.apps.UsersConfig",
     "medias.apps.MediasConfig",
     "cctvs.apps.CCTVsConfig",
     "violations.apps.ViolationsConfig",
@@ -129,3 +130,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Auth
+AUTH_USER_MODEL = "users.User"

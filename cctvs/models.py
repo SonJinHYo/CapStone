@@ -11,6 +11,9 @@ class CCTV(models.Model):
         description (TextField) : 상세 주소 및 추가 설명
     """
 
+    class Meta:
+        verbose_name_plural = "CCTVs"
+
     name = models.CharField(
         max_length=50,
         verbose_name="모델명",
@@ -22,7 +25,6 @@ class CCTV(models.Model):
     description = models.TextField(
         verbose_name="상세 주소 / 추가 설명",
         blank=True,
-        null=True,
     )
 
     def __str__(self) -> str:
