@@ -1,10 +1,27 @@
 from rest_framework.serializers import ModelSerializer
-from .models import ViolationInfo
+from cctvs.serializers import TinyCCTVSerializer
+from .models import ViolationInfo, Violation
 
 
 class TinyViolationSerializer(ModelSerializer):
-    """api/v1/service 페이지의 전체 현황 요약에 보일 ViolationInfo 필드"""
+    """api/v1/service (전체현황요약 페이지) 에 사용할 위반사항 serializer"""
+
+    class Meta:
+        model = Violation
+        fields = ("name",)
+
+
+class ViolationInfoSerializer(ModelSerializer):
+    """위반 관련 정보를 모두 보여주는 serializer"""
+
+    violations = TinyViolationSerializer(read_only=True, many=True)
+    cctv = TinyCCTVSerializer(read_only=True)
 
     class Meta:
         model = ViolationInfo
-        fields = "__all__"
+        fields = (
+            "violations",
+            "cctv",
+            "detected_time",
+        )
+        depth = 1
