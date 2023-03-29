@@ -68,10 +68,10 @@ class TestALLViolations(APITestCase):
 
         return v_info2
 
-    def test_objs_create(self):
+    def test_objs_create_pass(self):
+        """
+        객체 생성 성공 테스트
+        """
         cctv = self.create_cctv()
         v_info1 = self.create_violation_info_1()
         v_info2 = self.create_violation_info_2()
-        print(cctv)
-        print(v_info1)
-        print(v_info2)
