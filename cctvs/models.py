@@ -12,7 +12,7 @@ class CCTV(models.Model):
     """
 
     class Meta:
-        verbose_name_plural = "CCTVs"
+        verbose_name_plural = "CCTV 관리"
 
     name = models.CharField(
         max_length=50,

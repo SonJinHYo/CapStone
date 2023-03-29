@@ -5,7 +5,7 @@ class ViolationInfo(models.Model):
     """Violation Model Description
 
     Fields:
-        name (ManyToManyField) : 위반 사항
+        violations (ManyToManyField) : 위반 사항들
         img (URLField) : 위반당시 이미지 주소
         cctv : 위반 이미지를 찍은 cctv 위치
         detected_time (DateTimeField) : 위반 당시 시간
@@ -14,7 +14,7 @@ class ViolationInfo(models.Model):
         위반정보를 전부 모은 모델. 하나의 오브젝트가 하나의 위반데이터를 가진다.
     """
 
-    name = models.ManyToManyField(
+    violations = models.ManyToManyField(
         "violations.Violation",
         related_name="v_info",
     )
@@ -30,7 +30,10 @@ class ViolationInfo(models.Model):
     )  # 이후 수정 필요 (감지 시간을 언제로 받을지 / DateField? DateTimeField?)
 
     def __str__(self) -> str:
-        return ",".join([obj.name for obj in self.name.all()])
+        return ",".join([violation.name for violation in self.violations.all()])
+
+    class Meta:
+        verbose_name_plural = "규정 위반 데이터 관리"
 
 
 class Violation(models.Model):
@@ -46,3 +49,6 @@ class Violation(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        verbose_name_plural = "위반규정 관리"

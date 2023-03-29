@@ -9,16 +9,11 @@ class ViolationInfoAdmin(admin.ModelAdmin):
     list_display = (
         "name_list",
         "cctv",
+        "detected_time",
     )
 
     def name_list(self, obj):
-        # print("AAAAAAAAA", dir(obj.name))
-        for i in obj.name.all():
-            print(i.name)
-        print()
-        print()
-        print()
-        return ",".join([name.name for name in obj.name.all()])
+        return ",".join([violation.name for violation in obj.violations.all()])
 
 
 @admin.register(Violation)
