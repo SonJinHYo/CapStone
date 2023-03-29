@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 CUSTOM_APPS = [
     "users.apps.UsersConfig",
-    "medias.apps.MediasConfig",
     "cctvs.apps.CCTVsConfig",
     "violations.apps.ViolationsConfig",
 ]

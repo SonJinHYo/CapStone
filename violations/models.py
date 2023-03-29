@@ -6,8 +6,10 @@ class ViolationInfo(models.Model):
 
     Fields:
         name (ManyToManyField) : 위반 사항
-        img () : 위반당시 이미지
-        region : 위반
+        img (URLField) : 위반당시 이미지 주소
+        cctv : 위반 이미지를 찍은 cctv 위치
+        detected_time (DateTimeField) : 위반 당시 시간
+
     Descriptions:
         위반정보를 전부 모은 모델. 하나의 오브젝트가 하나의 위반데이터를 가진다.
     """
@@ -16,17 +18,19 @@ class ViolationInfo(models.Model):
         "violations.Violation",
         related_name="v_info",
     )
-    img = models.ForeignKey(
-        "medias.Photo",
-        on_delete=models.CASCADE,
-        related_name="v_info",
-    )
+    img = models.URLField(max_length=300, verbose_name="이미지 URL")
     cctv = models.ForeignKey(
         "cctvs.CCTV",
         on_delete=models.SET_NULL,
         related_name="v_info",
         null=True,
     )
+    detected_time = models.DateTimeField(
+        auto_now=False
+    )  # 이후 수정 필요 (감지 시간을 언제로 받을지 / DateField? DateTimeField?)
+
+    def __str__(self) -> str:
+        return ",".join([obj.name for obj in self.name.all()])
 
 
 class Violation(models.Model):
@@ -39,3 +43,6 @@ class Violation(models.Model):
 
     name = models.CharField(max_length=50)
     law = models.TextField()
+
+    def __str__(self) -> str:
+        return self.name
