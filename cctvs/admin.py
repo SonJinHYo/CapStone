@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CCTV
+from .models import CCTV, Video
 
 
 @admin.register(CCTV)
@@ -11,3 +11,8 @@ class CCTVAdmin(admin.ModelAdmin):
         "region",
         "description",
     )
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    """Video class를 관리"""

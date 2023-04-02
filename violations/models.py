@@ -39,7 +39,7 @@ class ViolationInfo(models.Model):
 class Violation(models.Model):
     """Violation Model Description
 
-    Fields
+    Fields:
         name (CharField) : 위반 사항
         law (CharField) : 위반 사항에 대한 법률
     """
