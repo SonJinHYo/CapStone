@@ -19,25 +19,7 @@ class AllViolationsTest(APITestCase):
     Request Parameters:
         None
 
-    Response:
-        A JSON object containing the count of all violations detected, the number of violations detected in each region, and the number of violations detected in each hour.
-        {
-            "violationCountObj": {
-                "<violation 1>": <count>,
-                "<violation 2>": <count>,
-                ...
-            },
-            "regionCountObj": {
-                "<region 1>": <count>,
-                "<region 2>": <count>,
-                ...
-            },
-            "detectedHourCountObj": {
-                "<hour 1>": <count>,
-                "<hour 2>": <count>,
-                ...
-            }
-        }
+
     """
 
     def setUp(self):

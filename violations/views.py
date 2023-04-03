@@ -16,12 +16,40 @@ class AllViolations(APIView):
 
     Methods:
         get(request): 위반 유형, 지역 및 감지 시간별로 개수를 검색하고 dict 형식으로 반환합니다.
+            Response:
 
     Attributes:
         None
     """
 
     def get(self, request):
+        """
+        Args:
+            request.data : None
+
+        Returns:
+            _dict_ : 각 위반사항 갯수 반환
+
+        example:
+            {
+                "violationCountObj": {
+                    "<violation 1>": <count>,
+                    "<violation 2>": <count>,
+                    ...
+                },
+                "regionCountObj": {
+                    "<region 1>": <count>,
+                    "<region 2>": <count>,
+                    ...
+                },
+                "detectedHourCountObj": {
+                    "<hour 1>": <count>,
+                    "<hour 2>": <count>,
+                    ...
+                }
+            }
+
+        """
         violation_cnt, region_cnt, detected_hour_cnt = (
             defaultdict(int),
             defaultdict(int),
@@ -44,6 +72,37 @@ class AllViolations(APIView):
             data,
             status=HTTP_200_OK,
         )
+
+
+class ViolationDetail(APIView):
+    def get(self, request, choice1, choice2):
+        if choice1 not in {"violation", "region", "time"}:
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+        if choice1 == "violation":  # choice2 : 위반사항
+            serializer = ViolationInfoSerializer(
+                ViolationInfo.objects.filter(violations__name__contains=choice2),
+                many=True,
+            )
+            return Response(data=serializer.data, status=HTTP_200_OK)
+
+        elif choice1 == "region":  # choice2 : 지역
+            cctv = CCTV.objects.get(region=choice2)
+            serializer = ViolationInfoSerializer(
+                ViolationInfo.objects.filter(cctv=cctv),
+                many=True,
+            )
+        elif choice1 == "time":  # choice2 : 연/월/일
+            year, month, day = choice2.split("/")
+            serializer = ViolationInfoSerializer(
+                ViolationInfo.objects.filter(
+                    detected_time__year=year,
+                    detected_time__month=month,
+                    detected_time__day=day,
+                ),
+                many=True,
+            )
+            return Response(data=serializer.data, status=HTTP_200_OK)
 
 
 class Choice(APIView):
