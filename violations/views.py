@@ -2,23 +2,23 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import *
 from .serializers import ViolationInfoSerializer
-from .models import ViolationInfo
+from .models import ViolationInfo, Violation
+from cctvs.models import CCTV
 
 from collections import defaultdict
 import json
 
 
 class AllViolations(APIView):
-    """descriptions ALLViolations Class
+    """AllViolations APIView
 
-    return:
-        data (dict): 위반 횟수를 센 정보를 합친 딕셔너리
-        data["violationCountObj"] (dict) : 각 규정별 위반 횟수
-        data["regionCountObj"] (dict) : 각 구역별 위반 횟수
-        data["detectedHourCountObj"] (dict) : 각 시간대별 위반 횟수 (감지된 시간의 hour만 측정)
+    ViolationInfo 모델을 사용하여 각 위반 유형, 지역 및 감지 시간별로 계수를 반환하는 API end point.
 
-    Description:
-        전체 현황을 요약하여 보여주기 위한 view클래스.
+    Methods:
+        get(request): 위반 유형, 지역 및 감지 시간별로 개수를 검색하고 dict 형식으로 반환합니다.
+
+    Attributes:
+        None
     """
 
     def get(self, request):
@@ -44,3 +44,36 @@ class AllViolations(APIView):
             data,
             status=HTTP_200_OK,
         )
+
+
+class Choice(APIView):
+    """Choice APIView
+
+    POST 요청에 따라 반환할 데이터를 결정하는 API end point.
+
+    Method:
+        get(request): HTTP_200_OK 상태로 response.
+        post(request): POST 요청에 따라 해당 존재하는 데이터를 제공.
+
+    Attribute:
+        None
+    """
+
+    def get(self, request):
+        return Response(status=HTTP_200_OK)
+
+    def post(self, request):
+        data = request.data
+        if data["kind"] == "violation":
+            response_data = [violation.name for violation in Violation.objects.all()]
+            return Response(response_data, status=HTTP_200_OK)
+
+        elif data["kind"] == "region":
+            response_data = [cctv.region for cctv in CCTV.objects.all()]
+            return Response(response_data, status=HTTP_200_OK)
+
+        elif data["kind"] == "time":
+            return Response(status=HTTP_200_OK)
+
+        else:
+            return Response(status=HTTP_400_BAD_REQUEST)

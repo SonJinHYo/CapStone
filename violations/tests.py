@@ -65,6 +65,7 @@ class AllViolationsTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        # check instance type
         data = response.data
         self.assertIsInstance(data, dict)
 

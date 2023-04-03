@@ -3,8 +3,5 @@ from . import views
 
 urlpatterns = [
     path("service", views.AllViolations.as_view(), name="all_violations"),
-    path(
-        "service/detail",
-        views.AllViolations.as_view(),
-    ),
+    path("choice", views.Choice.as_view(), name="choice"),
 ]
