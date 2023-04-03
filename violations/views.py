@@ -6,7 +6,6 @@ from .models import ViolationInfo, Violation
 from cctvs.models import CCTV
 
 from collections import defaultdict
-import json
 
 
 class AllViolations(APIView):
@@ -14,9 +13,8 @@ class AllViolations(APIView):
 
     ViolationInfo 모델을 사용하여 각 위반 유형, 지역 및 감지 시간별로 계수를 반환하는 API end point.
 
-    Methods:
-        get(request): 위반 유형, 지역 및 감지 시간별로 개수를 검색하고 dict 형식으로 반환합니다.
-            Response:
+    Method:
+        get(request)
 
     Attributes:
         None
@@ -24,31 +22,14 @@ class AllViolations(APIView):
 
     def get(self, request):
         """
-        Args:
-            request.data : None
+        모든 위반 정보에서 감지된 위반의 수, 각 지역에서 감지된 위반의 수,
+        감지된 시간대별 위반의 수를 포함하는 JSON 반환.
 
         Returns:
-            _dict_ : 각 위반사항 갯수 반환
-
-        example:
-            {
-                "violationCountObj": {
-                    "<violation 1>": <count>,
-                    "<violation 2>": <count>,
-                    ...
-                },
-                "regionCountObj": {
-                    "<region 1>": <count>,
-                    "<region 2>": <count>,
-                    ...
-                },
-                "detectedHourCountObj": {
-                    "<hour 1>": <count>,
-                    "<hour 2>": <count>,
-                    ...
-                }
-            }
-
+            JSON:
+                - violationCountObj (_dict_): 위반 정보별 위반 횟수
+                - regionCountObj (_dict_): 각 지역별 위반 횟수
+                - detectedHourCountObj (_dict_): 시간대(시 단윈)별 위반 횟수
         """
         violation_cnt, region_cnt, detected_hour_cnt = (
             defaultdict(int),
@@ -75,9 +56,29 @@ class AllViolations(APIView):
 
 
 class ViolationDetail(APIView):
+    """ViolationDetail APIView
+
+        요청받은 조건을 만족하는 위반 정보를 자세하게 모두 보내는 API end point.
+
+    Method:
+        get(request,choice1,choice2)
+
+    Attributes:
+        None
+    """
+
     def get(self, request, choice1, choice2):
-        if choice1 not in {"violation", "region", "time"}:
-            return Response(status=HTTP_400_BAD_REQUEST)
+        """
+        choice1과 choice2를 기반으로 위반사항, 지역, 날짜 정보에 따른 위반 정보를 반환.
+
+        Parameters:
+            - request: HTTP 요청
+            - choice1 (_str_) : "violation", "region", "time" 중 하나로 선택됩.
+            - choice2 (_str_) : choice1에 따라 위반사항의 이름, 지역 이름, 날짜 정보 중 하나로 선택.
+
+        Returns:
+            - Response: 해당 요청에 따른 위반 정보가 담긴 JSON 형식의 데이터를 반환.
+        """
 
         if choice1 == "violation":  # choice2 : 위반사항
             serializer = ViolationInfoSerializer(
@@ -103,6 +104,8 @@ class ViolationDetail(APIView):
                 many=True,
             )
             return Response(data=serializer.data, status=HTTP_200_OK)
+        else:
+            return Response(status=HTTP_400_BAD_REQUEST)
 
 
 class Choice(APIView):
@@ -111,17 +114,17 @@ class Choice(APIView):
     POST 요청에 따라 반환할 데이터를 결정하는 API end point.
 
     Method:
-        get(request): HTTP_200_OK 상태로 response.
-        post(request): POST 요청에 따라 해당 존재하는 데이터를 제공.
+        get(request): GET 요청에 따라 해당 존재하는 데이터를 제공.
 
     Attribute:
         None
     """
 
     def get(self, request):
-        return Response(status=HTTP_200_OK)
+        """
+        POST 요청을 처리하고, 요청 데이터의 'kind'(선택한 필터 종류) 따라 다른 Response를 반환.
 
-    def post(self, request):
+        """
         data = request.data
         if data["kind"] == "violation":
             response_data = [violation.name for violation in Violation.objects.all()]
