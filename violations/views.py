@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import *
+from .serializers import ViolationInfoSerializer
 from .models import ViolationInfo
 
 from collections import defaultdict
+import json
 
 
 class AllViolations(APIView):

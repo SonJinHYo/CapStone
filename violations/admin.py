@@ -1,11 +1,18 @@
 from django.contrib import admin
 from .models import ViolationInfo, Violation
+import time
+
+
+@admin.action(description="test")
+def action_test(ViolationInfo, request, queryset):
+    time.sleep(5)
 
 
 @admin.register(ViolationInfo)
 class ViolationInfoAdmin(admin.ModelAdmin):
     """ViolationInfo class 관리"""
 
+    actions = (action_test,)
     list_display = (
         "name_list",
         "cctv",

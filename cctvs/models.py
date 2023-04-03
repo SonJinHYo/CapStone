@@ -7,14 +7,11 @@ from django.db import models
 class CCTV(models.Model):
     """CCTV Model Description
 
-    Fields
+    Fields:
         name (CharField) : 모델명
         region (CharField) : 설치 지역
         description (TextField) : 상세 주소 및 추가 설명
     """
-
-    class Meta:
-        verbose_name_plural = "CCTV 관리"
 
     name = models.CharField(
         max_length=50,
@@ -35,6 +32,9 @@ class CCTV(models.Model):
         else:
             return f"{self.region} / {self.description}"
 
+    class Meta:
+        verbose_name_plural = "CCTV 관리"
+
 
 def custom_upload_to(instance, filename):
     return os.path.join(instance.cctv, filename)
@@ -53,7 +53,7 @@ class Video(models.Model):
     video = models.FileField(upload_to=custom_upload_to, max_length=100)
     cctv = models.ForeignKey(
         "cctvs.CCTV",
-        verbose_name="cctv",
+        verbose_name="CCTV",
         on_delete=models.SET_NULL,
         related_name="videos",
         null=True,
