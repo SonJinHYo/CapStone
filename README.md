@@ -1,4 +1,4 @@
-# QuickBoard Service
+# QuitBoard Service
 QuickBoard는 급증하는 전동스쿠터 사고율의 인식을 전환하고자 만든 비영리 목적의 프로젝트입니다.  
 cctv영상을 통해 전동스쿠터와 관련된 여러 위반 사항을 감지하여 초상권을 준수하는 선에서 위반 정보를 제공합니다. 
 
