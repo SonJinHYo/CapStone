@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import *
@@ -6,6 +8,8 @@ from .models import ViolationInfo, Violation
 from cctvs.models import CCTV
 
 from collections import defaultdict
+
+import datetime
 
 
 class AllViolations(APIView):
@@ -62,10 +66,26 @@ class ViolationDetail(APIView):
 
     Method:
         get(request,choice1,choice2)
-
+        validate_date(date_text)
     Attributes:
         None
     """
+
+    def validate_date_input(self, date_text):
+        """유효 날짜 확인 함수
+
+        Args:
+            date_text (str): ex. "2023_02_22"
+
+        Returns:
+            boolean : _
+        """
+
+        try:
+            result = timezone.datetime.strptime(date_text, "%Y_%m_%d")
+            return True
+        except ValueError:
+            return False
 
     def get(self, request, choice1, choice2):
         """
@@ -88,13 +108,20 @@ class ViolationDetail(APIView):
             return Response(data=serializer.data, status=HTTP_200_OK)
 
         elif choice1 == "region":  # choice2 : 지역
-            cctv = CCTV.objects.get(region=choice2)
             serializer = ViolationInfoSerializer(
-                ViolationInfo.objects.filter(cctv=cctv),
+                ViolationInfo.objects.filter(cctv__region=choice2),
                 many=True,
             )
-        elif choice1 == "time":  # choice2 : 연/월/일
-            year, month, day = choice2.split("/")
+            return Response(data=serializer.data, status=HTTP_200_OK)
+
+        elif choice1 == "time":  # choice2 : 연_월_일
+            # DB를 살펴볼 필요가 없은 예외
+            # 3개의 입력이 아니고, 연/월/일 입력이 유효하지 않은 날짜일 때,
+            if not self.validate_date_input(choice2):
+                return Response(status=HTTP_400_BAD_REQUEST)
+
+            year, month, day = choice2.split("_")
+
             serializer = ViolationInfoSerializer(
                 ViolationInfo.objects.filter(
                     detected_time__year=year,
@@ -120,21 +147,20 @@ class Choice(APIView):
         None
     """
 
-    def get(self, request):
+    def get(self, request, kind):
         """
         POST 요청을 처리하고, 요청 데이터의 'kind'(선택한 필터 종류) 따라 다른 Response를 반환.
 
         """
-        data = request.data
-        if data["kind"] == "violation":
+        if kind == "violation":
             response_data = [violation.name for violation in Violation.objects.all()]
             return Response(response_data, status=HTTP_200_OK)
 
-        elif data["kind"] == "region":
+        elif kind == "region":
             response_data = [cctv.region for cctv in CCTV.objects.all()]
             return Response(response_data, status=HTTP_200_OK)
 
-        elif data["kind"] == "time":
+        elif kind == "time":
             return Response(status=HTTP_200_OK)
 
         else:
