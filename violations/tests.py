@@ -175,33 +175,33 @@ class ViolationDetailTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-# class ChoiceTestCase(APITestCase):
-#     def test_get_violation(self):
-#         url = reverse("choice", args=["violation"])
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+class ChoiceTestCase(APITestCase):
+    def test_get_violation(self):
+        url = reverse("choice", args=["violation"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#         # 모든 위반 정보 객체의 이름이 응답값에 존재하는지 확인합니다.
-#         violations = Violation.objects.all()
-#         for violation in violations:
-#             self.assertIn(violation.name, response.data)
+        # 모든 위반 정보 객체의 이름이 response에 존재하는지 확인.
+        violations = Violation.objects.all()
+        for violation in violations:
+            self.assertIn(violation.name, response.data)
 
-#     def test_get_region(self):
-#         url = reverse("choice", args=["region"])
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_get_region(self):
+        url = reverse("choice", args=["region"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#         # 모든 CCTV 객체의 지역 정보가 응답값에 존재하는지 확인합니다.
-#         cctvs = CCTV.objects.all()
-#         for cctv in cctvs:
-#             self.assertIn(cctv.region, response.data)
+        # 모든 CCTV 객체의 지역 정보가 response에 존재하는지 확인.
+        cctvs = CCTV.objects.all()
+        for cctv in cctvs:
+            self.assertIn(cctv.region, response.data)
 
-#     def test_get_time(self):
-#         url = reverse("choice", args=["time"])
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_get_time(self):
+        url = reverse("choice", args=["time"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#     def test_get_invalid_kind(self):
-#         url = reverse("choice", args=["invalid_kind"])
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_get_invalid_kind(self):
+        url = reverse("choice", args=["invalid_kind"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
