@@ -22,6 +22,6 @@ class ViolationInfoSerializer(ModelSerializer):
         fields = (
             "violations",
             "cctv",
+            "img",
             "detected_time",
         )
-        depth = 1

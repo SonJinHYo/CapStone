@@ -71,7 +71,7 @@ class ViolationDetail(APIView):
         None
     """
 
-    def validate_date_input(self, date_text):
+    def valid_date_input(self, date_text):
         """유효 날짜 확인 함수
 
         Args:
@@ -117,7 +117,7 @@ class ViolationDetail(APIView):
         elif choice1 == "time":  # choice2 : 연_월_일
             # DB를 살펴볼 필요가 없은 예외
             # 3개의 입력이 아니고, 연/월/일 입력이 유효하지 않은 날짜일 때,
-            if not self.validate_date_input(choice2):
+            if not self.valid_date_input(choice2):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
             year, month, day = choice2.split("_")
