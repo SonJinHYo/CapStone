@@ -65,7 +65,7 @@ class ViolationDetail(APIView):
         요청받은 조건을 만족하는 위반 정보를 자세하게 모두 보내는 API end point.
 
     Method:
-        get(request,choice1,choice2)
+        get(request,kind,detail)
         validate_date(date_text)
     Attributes:
         None
@@ -87,40 +87,40 @@ class ViolationDetail(APIView):
         except ValueError:
             return False
 
-    def get(self, request, choice1, choice2):
+    def get(self, request, kind, detail):
         """
-        choice1과 choice2를 기반으로 위반사항, 지역, 날짜 정보에 따른 위반 정보를 반환.
+        kind과 detail를 기반으로 위반사항, 지역, 날짜 정보에 따른 위반 정보를 반환.
 
         Parameters:
             - request: HTTP 요청
-            - choice1 (_str_) : "violation", "region", "time" 중 하나로 선택됩.
-            - choice2 (_str_) : choice1에 따라 위반사항의 이름, 지역 이름, 날짜 정보 중 하나로 선택.
+            - kind (_str_) : "violation", "region", "time" 중 하나로 선택됩.
+            - detail (_str_) : kind에 따라 위반사항의 이름, 지역 이름, 날짜 정보 중 하나로 선택.
 
         Returns:
             - Response: 해당 요청에 따른 위반 정보가 담긴 JSON 형식의 데이터를 반환.
         """
 
-        if choice1 == "violation":  # choice2 : 위반사항
+        if kind == "violation":  # detail : 위반사항
             serializer = ViolationInfoSerializer(
-                ViolationInfo.objects.filter(violations__name__contains=choice2),
+                ViolationInfo.objects.filter(violations__name__contains=detail),
                 many=True,
             )
             return Response(data=serializer.data, status=HTTP_200_OK)
 
-        elif choice1 == "region":  # choice2 : 지역
+        elif kind == "region":  # detail : 지역
             serializer = ViolationInfoSerializer(
-                ViolationInfo.objects.filter(cctv__region=choice2),
+                ViolationInfo.objects.filter(cctv__region=detail),
                 many=True,
             )
             return Response(data=serializer.data, status=HTTP_200_OK)
 
-        elif choice1 == "time":  # choice2 : 연_월_일
+        elif kind == "time":  # detail : 연_월_일
             # DB를 살펴볼 필요가 없은 예외
             # 3개의 입력이 아니고, 연/월/일 입력이 유효하지 않은 날짜일 때,
-            if not self.valid_date_input(choice2):
+            if not self.valid_date_input(detail):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
-            year, month, day = choice2.split("_")
+            year, month, day = detail.split("_")
 
             serializer = ViolationInfoSerializer(
                 ViolationInfo.objects.filter(
