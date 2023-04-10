@@ -58,3 +58,8 @@ class Video(models.Model):
         related_name="videos",
         null=True,
     )
+
+    upload = models.BooleanField(
+        blank=False,
+        default=False,
+    )
