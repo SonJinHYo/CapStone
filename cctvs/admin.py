@@ -41,9 +41,11 @@ def start_analysis(model_admin, request, videos):
             # upload_video 함수에서 위반 정보들을 받아온다.
             for violation_info in upload_video(video_address="video_address"):
                 # 위반 정보가 객체 정보에 들어맞다면 저장
-                serializer = ViolationInfoSerializer(**violation_info)
+                serializer = ViolationInfoSerializer(data=violation_info)
                 if serializer.is_valid():
                     serializer.save()
+            video.upload = True
+            video.save()
 
 
 @admin.register(Video)
