@@ -37,20 +37,31 @@ class CCTV(models.Model):
 
 
 def custom_upload_to(instance, filename):
-    return os.path.join(instance.cctv, filename)
+    return os.path.join("media/cctv", instance.cctv.name, filename)
 
 
 class Video(models.Model):
     """Video Model Description
 
     Field:
-        video (FileField) : 동영상을 받는 필드. 딥러닝 모델을 거쳐 위반 이미지만 db에 저장할 예정
+        file (FileField) : 동영상을 받는 필드. 딥러닝 모델을 거쳐 위반 이미지만 db에 저장할 예정
+        file_name (CharField) : 파일명
         cctv (ForeignKey) : 해당 비디오를 찍은 cctv
+        uppload (BooleanField) : 해당 영상을 업로드하여 분석했는지 여부를 확인
     """
 
     # 임시 함수. 후에 딥러닝 모델과 결합 후 위치,내용 재정의
 
-    video = models.FileField(upload_to=custom_upload_to, max_length=100)
+    file = models.FileField(
+        upload_to=custom_upload_to,
+        max_length=100,
+    )
+
+    file_name = models.CharField(
+        max_length=50,
+        default="",
+    )
+
     cctv = models.ForeignKey(
         "cctvs.CCTV",
         verbose_name="CCTV",
@@ -63,3 +74,6 @@ class Video(models.Model):
         blank=False,
         default=False,
     )
+
+    def __str__(self) -> str:
+        return self.file_name
