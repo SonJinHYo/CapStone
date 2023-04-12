@@ -33,7 +33,7 @@ def upload_video(video_address):
     return list()
 
 
-@admin.action(description="영상 분석하기")
+@admin.action(description="영상 분석 후 업로드")
 def start_analysis(model_admin, request, videos):
     for video in videos.all():
         # 업로드가 안된 객체만 수행

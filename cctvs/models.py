@@ -60,6 +60,7 @@ class Video(models.Model):
     file_name = models.CharField(
         max_length=50,
         default="",
+        blank=True,
     )
 
     cctv = models.ForeignKey(
