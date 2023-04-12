@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# Admin
+admin.site.site_header = "CCTV 데이터 관리"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/violations/", include("violations.urls")),

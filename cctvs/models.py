@@ -71,10 +71,7 @@ class Video(models.Model):
         null=True,
     )
 
-    upload = models.BooleanField(
-        blank=False,
-        default=False,
-    )
+    upload = models.BooleanField(blank=False, default=False, verbose_name="업로드 여부")
 
     def __str__(self) -> str:
-        return self.file_name
+        return f"{self.cctv.name}/{self.file.name}"

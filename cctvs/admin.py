@@ -29,6 +29,7 @@ def upload_video(video_address):
                 detected_time : (str: 위반 당시 시간)
             }
     """
+
     pass
     return list()
 
@@ -52,6 +53,6 @@ def start_analysis(model_admin, request, videos):
 class VideoAdmin(admin.ModelAdmin):
     actions = (start_analysis,)
     list_display = (
-        "file_name",
+        "file",
         "upload",
     )
