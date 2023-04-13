@@ -82,7 +82,7 @@ class ViolationDetail(APIView):
         """
 
         try:
-            result = timezone.datetime.strptime(date_text, "%Y_%m_%d")
+            result = timezone.datetime.strptime(date_text, "%Y_%m_%d") 
             return True
         except ValueError:
             return False
