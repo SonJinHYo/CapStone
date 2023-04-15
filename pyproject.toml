@@ -7,9 +7,13 @@ license = "\"MIT\""
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-django = "^4.1.7"
+python = "^3.10.6"
 djangorestframework = "^3.14.0"
+wheel = "^0.40.0"
+cmake = "^3.26.3"
+gunicorn = "^20.1.0"
+django = "^4.2"
+uwsgi = "^2.0.21"
 
 
 [build-system]

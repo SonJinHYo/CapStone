@@ -6,7 +6,6 @@ from rest_framework.status import *
 from .serializers import ViolationInfoSerializer
 from .models import ViolationInfo, Violation
 from cctvs.models import CCTV
-
 from collections import defaultdict
 
 import datetime
