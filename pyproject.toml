@@ -16,6 +16,7 @@ django = "^4.2"
 uwsgi = "^2.0.21"
 mysqlclient = "^2.1.1"
 pymysql = "^1.0.3"
+django-environ = "^0.10.0"
 
 
 [build-system]
