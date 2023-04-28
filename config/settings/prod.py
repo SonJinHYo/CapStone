@@ -5,4 +5,13 @@ ALLOWED_HOSTS = [
 ]
 STATIC_ROOT = BASE_DIR / 'static/'
 STATICFILES_DIRS = []
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+
 DEBUG = True
