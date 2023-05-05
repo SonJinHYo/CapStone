@@ -15,7 +15,7 @@ ALLOWED_HOSTS = [
 DEBUG = True
 
 STORAGES = {
-    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "default": {"BACKEND": "config.storages.MediaStorage"},
     "staticfiles":{"BACKEND": "config.storages.StaticStorage"},
     }
 

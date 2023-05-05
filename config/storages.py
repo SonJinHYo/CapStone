@@ -15,9 +15,4 @@ class StaticStorage(S3Boto3Storage):
 
 # 미디어 파일용
 class MediaStorage(S3Boto3Storage):
-    default_acl = 'public-read'
-    location = 'media'
-
-# AWS 정적 파일용
-class StaticStorage(S3Boto3Storage):
-	location = settings.AWS_STATIC_LOCATION
+    location = 'zip_dir'

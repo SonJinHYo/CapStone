@@ -37,35 +37,6 @@ class CCTV(models.Model):
     class Meta:
         verbose_name_plural = "CCTV 관리"
         
-class S3Uploader:
-    env = environ.Env()
-    
-    def __init__(self, file):
-        self.file = file
-
-    def upload(self):
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id     = env("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key = env("AWS_SECRET_ACCESS_KEY")
-        )
-        url = 'zip_dir'+'/'+uuid.uuid1().hex
-        
-        s3_client.upload_fileobj(
-            self.file, 
-            env("AWS_STORAGE_BUCKET_NAME"), 
-            url, 
-            ExtraArgs={
-                "ContentType": self.file.content_type
-            }
-        )
-        return url
-
-def custom_upload_to(instance, filename):
-    uploader = S3Uploader(instance)
-    url = uploader.upload()
-    return os.path.join("media/cctv", instance.cctv.name, filename)
-
 
 class ViolationFile(models.Model):
     """Video Model Description
@@ -77,7 +48,6 @@ class ViolationFile(models.Model):
     # 임시 함수. 후에 딥러닝 모델과 결합 후 위치,내용 재정의
 
     file = models.FileField(
-        upload_to=custom_upload_to,
         max_length=100,
     )
 
