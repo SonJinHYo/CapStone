@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import CCTV
+from .models import CCTV,ViolationFile
 
 
 class CCTVSerializers(ModelSerializer):
@@ -16,3 +16,8 @@ class TinyCCTVSerializer(ModelSerializer):
     class Meta:
         model = CCTV
         fields = ("region",)
+
+class FileSerializer(ModelSerializer):
+    class Meta:
+        model = ViolationFile
+        fiedls="__all__"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CCTV, Video
+from .models import CCTV,ViolationFile
 from violations.models import ViolationInfo
 from violations.serializers import ViolationInfoSerializer
 
@@ -34,8 +34,9 @@ def upload_video(video_address):
     return list()
 
 
-@admin.action(description="영상 분석 후 업로드")
-def start_analysis(model_admin, request, videos):
+@admin.action(description="S3 버킷의 데이터 불러오기")
+def upload_zip_file(model_admin, request, videos):
+    
     for video in videos.all():
         # 업로드가 안된 객체만 수행
         if not video.upload:
@@ -49,10 +50,10 @@ def start_analysis(model_admin, request, videos):
             video.save()
 
 
-@admin.register(Video)
-class VideoAdmin(admin.ModelAdmin):
-    actions = (start_analysis,)
+@admin.register(ViolationFile)
+class ViolationFileAdmin(admin.ModelAdmin):
+    actions = (upload_zip_file,)
     list_display = (
         "file",
-        "upload",
+        "cctv",
     )

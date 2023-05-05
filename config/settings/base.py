@@ -25,7 +25,7 @@ environ.Env.read_env(os.path.join(BASE_DIR,".env"))
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-bttg%pz*&++#qtr7_tr7h+blfsk#25%*h%$osm)d8#cyz@zk)p"
+SECRET_KEY = env("SECRETS_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,6 +35,7 @@ DEBUG = True
 # Application definition
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "storages",
 ]
 
 CUSTOM_APPS = [

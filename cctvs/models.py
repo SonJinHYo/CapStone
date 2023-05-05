@@ -1,4 +1,6 @@
 import os
+import boto3
+import environ
 
 from django.db import models
 
@@ -34,20 +36,42 @@ class CCTV(models.Model):
 
     class Meta:
         verbose_name_plural = "CCTV 관리"
+        
+class S3Uploader:
+    env = environ.Env()
+    
+    def __init__(self, file):
+        self.file = file
 
+    def upload(self):
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id     = env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key = env("AWS_SECRET_ACCESS_KEY")
+        )
+        url = 'zip_dir'+'/'+uuid.uuid1().hex
+        
+        s3_client.upload_fileobj(
+            self.file, 
+            env("AWS_STORAGE_BUCKET_NAME"), 
+            url, 
+            ExtraArgs={
+                "ContentType": self.file.content_type
+            }
+        )
+        return url
 
 def custom_upload_to(instance, filename):
+    uploader = S3Uploader(instance)
+    url = uploader.upload()
     return os.path.join("media/cctv", instance.cctv.name, filename)
 
 
-class Video(models.Model):
+class ViolationFile(models.Model):
     """Video Model Description
 
     Field:
-        file (FileField) : 동영상을 받는 필드. 딥러닝 모델을 거쳐 위반 이미지만 db에 저장할 예정
-        file_name (CharField) : 파일명
-        cctv (ForeignKey) : 해당 비디오를 찍은 cctv
-        uppload (BooleanField) : 해당 영상을 업로드하여 분석했는지 여부를 확인
+        file (FileField) : 위반 데이터를 zip으로 받는 필드. 딥러닝 모델을 거쳐 위반 이미지만 db에 저장할 예정
     """
 
     # 임시 함수. 후에 딥러닝 모델과 결합 후 위치,내용 재정의
@@ -55,12 +79,6 @@ class Video(models.Model):
     file = models.FileField(
         upload_to=custom_upload_to,
         max_length=100,
-    )
-
-    file_name = models.CharField(
-        max_length=50,
-        default="",
-        blank=True,
     )
 
     cctv = models.ForeignKey(
@@ -71,7 +89,7 @@ class Video(models.Model):
         null=True,
     )
 
-    upload = models.BooleanField(blank=False, default=False, verbose_name="업로드 여부")
 
     def __str__(self) -> str:
         return f"{self.cctv.name}/{self.file.name}"
+
