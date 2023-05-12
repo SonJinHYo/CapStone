@@ -11,5 +11,10 @@ DATABASES = {
 
 DEBUG=True
 
+# media
+MEDIA_URL = '/media/'
+MEDIAFILES_DIRS = [
+    os.path.join(BASE_DIR, 'media'),
+]
 STATIC_ROOT = BASE_DIR / 'static/'
 STATICFILES_DIRS = []

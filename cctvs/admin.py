@@ -33,27 +33,9 @@ def upload_video(video_address):
     pass
     return list()
 
-
-@admin.action(description="S3 버킷의 데이터 불러오기")
-def upload_zip_file(model_admin, request, videos):
-    
-    for video in videos.all():
-        # 업로드가 안된 객체만 수행
-        if not video.upload:
-            # upload_video 함수에서 위반 정보들을 받아온다.
-            for violation_info in upload_video(video_address="video_address"):
-                # 위반 정보가 객체 정보에 들어맞다면 저장
-                serializer = ViolationInfoSerializer(data=violation_info)
-                if serializer.is_valid():
-                    serializer.save()
-            video.upload = True
-            video.save()
-
-
 @admin.register(ViolationFile)
 class ViolationFileAdmin(admin.ModelAdmin):
-    actions = (upload_zip_file,)
     list_display = (
         "file",
-        "cctv",
+        "cctv", 
     )

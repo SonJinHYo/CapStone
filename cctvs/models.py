@@ -59,7 +59,6 @@ class ViolationFile(models.Model):
         null=True,
     )
 
-
     def __str__(self) -> str:
-        return f"{self.cctv.name}/{self.file.name}"
+        return f"{self.cctv.region}"
 

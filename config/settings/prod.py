@@ -31,11 +31,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-# media
-MEDIA_URL = '/media/'
-MEDIAFILES_DIRS = [
-    os.path.join(BASE_DIR, 'media'),
-]
+
 
 
 DATABASES = {
@@ -44,7 +40,7 @@ DATABASES = {
         'NAME' : 'mysqlDB', # DB Name
         'USER' : 'admin', # DB User
         'PASSWORD' : env("AWS_DB_PASSWORD"), # Password
-        'HOST': 'database-1.c3zb6mrofwf7.ap-northeast-2.rds.amazonaws.com', # 생성한 데이터베이스 엔드포인트
+        'HOST': env('AWS_DB_HOST'), # 생성한 데이터베이스 엔드포인트
         'PORT': '3306', # 데이터베이스 포트
         'OPTIONS':{
             'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
