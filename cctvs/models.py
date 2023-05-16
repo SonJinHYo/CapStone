@@ -38,8 +38,8 @@ class CCTV(models.Model):
         verbose_name_plural = "CCTV 관리"
         
 
-def custom_upload(instance,filename):
-    return f'{instance.cctv.region}.zip'
+# def custom_upload(instance,filename):
+#     return f'{instance.cctv.region}.zip'
 
 class ViolationFile(models.Model):
     """Video Model Description
@@ -52,7 +52,7 @@ class ViolationFile(models.Model):
 
     file = models.FileField(
         max_length=100,
-        upload_to=custom_upload,
+        # upload_to=custom_upload,
     )
 
     cctv = models.ForeignKey(
