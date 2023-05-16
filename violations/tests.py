@@ -75,7 +75,7 @@ class AllViolationsTest(APITestCase):
 
 
 class ViolationDetailTestCase(APITestCase):
-    def setUp(self):
+    def setUp(self): 
         self.cctv1 = CCTV.objects.create(name="Test CCTV1", region="Test Region1")
         self.cctv2 = CCTV.objects.create(name="Test CCTV2", region="Test Region2")
         self.violations = [

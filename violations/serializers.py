@@ -3,6 +3,7 @@ from cctvs.serializers import TinyCCTVSerializer
 from .models import ViolationInfo, Violation
 
 
+
 class TinyViolationSerializer(ModelSerializer):
     """api/v1/service (전체현황요약 페이지) 에 사용할 위반사항 serializer"""
 
