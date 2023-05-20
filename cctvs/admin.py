@@ -26,10 +26,27 @@ class CCTVAdmin(admin.ModelAdmin):
         "description",
     )
     
-def save_violation_data(filename,region,s):  
+def save_violation_data(filename,region,text):
+    """ DB에 위반정보를 저장하는 함수
+    Args:
+        filename (str) : 확장자를 포함한 파일의 이름
+        region (str) : 위반 지역
+        text (str) : 위반 사항과 위반 시간을 담은 문자열 (ex. text = 0010,2023-04-23T15:45:43)
+        violation_list (list) : 현재 저장된 위반 사항
+        violations,time (str) : text를 , 기준으로 나누어 위반 사항과 시간을 저장한 변수
+        v_set (set) : 위반 사항을 전부 담은 집합
+        image_name (str) : 이미지는 filename과 같은 이름으로 확장자만 png로 다르기 때문에 filename의 확장자면 변경하여 image_name으로 저장한 변수
+        image_time (str) : DB에는 초단위까지 시간을 저장하지만 S3폴더에 일자별로 저장하기 위해 년월일 단위까지 따로 일자를 저장
+        bucket,key (str) : 버킷 이름, 하위 위치
+        v (django_Model_object) : DB에 저장할 django모델 객체
+        
+    Return:
+        None
+        
+    """
     violation_list = [obj.name for obj in Violation.objects.all()]
-    violations,time = s.split(',')
-    v_list = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
+    violations,time = text.split(',')
+    v_set = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
     
     image_name,image_time = f'{filename[:-4]}.png',time[:time.find('T')]
     bucket,key = 'quit-board-bucket', f'images/{image_time}/{image_name}'
@@ -40,12 +57,23 @@ def save_violation_data(filename,region,s):
         detected_time = time,
         img = f'https://{bucket}.s3.ap-northeast-2.amazonaws.com/{key}',
     )
-    v.violations.set([obj for obj in Violation.objects.all() if obj.name in v_list])
+    v.violations.set([obj for obj in Violation.objects.all() if obj.name in v_set])
     
     return None
 
 @admin.action(description="zip파일 업데이트 후 삭제")
 def update_violations_data(ViolationFileAdmin, request, violation_files):
+    """ zip파일 압축 해제 후 파싱하여 데이터를 저장하는 함수
+    
+    Args:
+        ViolationFileAdmin (class) : 관리 객체
+        request (dict) : request 정보
+        violation_files (class) : 관리창에서 선택한 객체 쿼리. (zip 파일들)
+        vio_dir = 압축 해제 후 위반 정보가 저장된 폴더의 위치
+    
+    Returns:
+        None
+    """
     try:
         with transaction.atomic():
             for violation_file in violation_files.all():
@@ -60,6 +88,7 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
                                 save_violation_data(filename,violation_file.cctv.region,content)
                     shutil.rmtree('/srv/QuitBoard_Backend/tmp')
                 violation_file.delete()
+        return None
     except Exception:
         raise exceptions.ParseError
 
