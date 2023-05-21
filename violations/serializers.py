@@ -1,5 +1,4 @@
 from rest_framework.serializers import ModelSerializer,SerializerMethodField
-from cctvs.serializers import TinyCCTVSerializer
 from .models import ViolationInfo, Violation
 
 

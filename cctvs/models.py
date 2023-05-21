@@ -3,6 +3,7 @@ import boto3
 import environ
 
 from django.db import models
+from django.core.validators import FileExtensionValidator
 
 
 # Create your models here.
@@ -38,9 +39,6 @@ class CCTV(models.Model):
         verbose_name_plural = "CCTV 관리"
         
 
-# def custom_upload(instance,filename):
-#     return f'{instance.cctv.region}.zip'
-
 class ViolationFile(models.Model):
     """Video Model Description
 
@@ -48,11 +46,18 @@ class ViolationFile(models.Model):
         file (FileField) : 위반 데이터를 zip으로 받는 필드. 딥러닝 모델을 거쳐 위반 이미지만 db에 저장할 예정
     """
 
-    # 임시 함수. 후에 딥러닝 모델과 결합 후 위치,내용 재정의
-
     file = models.FileField(
-        max_length=100,
-        # upload_to=custom_upload,
+        validators=[FileExtensionValidator(allowed_extensions=['zip'])],
+        help_text = f"zip을 업로드하세요. zip파일 구조는 다음과 같아야 합니다. <br/>\
+        - filename.zip<br/>\
+          &nbsp&nbsp&nbsp&nbsp- violations<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 1.txt<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 2.txt<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp:<br/>\
+          &nbsp&nbsp&nbsp&nbsp- images<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 1.png<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 2.png<br/>\
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp:"
     )
 
     cctv = models.ForeignKey(

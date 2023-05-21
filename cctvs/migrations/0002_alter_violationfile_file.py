@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='violationfile',
             name='file',
-            field=models.FileField(upload_to=cctvs.models.custom_upload),
+            field=models.FileField(),
         ),
     ]
