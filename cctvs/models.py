@@ -66,3 +66,5 @@ class ViolationFile(models.Model):
     def __str__(self) -> str:
         return f"{self.cctv.region}"
 
+    class Meta:
+        verbose_name_plural = "CCTV 영상 업로드"
