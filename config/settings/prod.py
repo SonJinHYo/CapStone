@@ -9,7 +9,7 @@ env = environ.Env()
 
 ALLOWED_HOSTS = [
     "ec2-43-200-248-130.ap-northeast-2.compute.amazonaws.com",
-    ".quitboard.click",
+    "quitboard.click",
 ]
 
 DEBUG = True
