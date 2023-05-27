@@ -12,7 +12,7 @@ ALLOWED_HOSTS = [
     "quitboard.click",
 ]
 
-DEBUG = True
+DEBUG = False
 
 STORAGES = {
     "default": {"BACKEND": "config.storages.MediaStorage"},
@@ -47,3 +47,11 @@ DATABASES = {
         }
     }
 }
+
+CORS_ALLOWED_ORIGINS = ["http://quitboard.click"]
+CSRF_TRUSTED_ORIGINS = ["http://quitboard.click"]
+
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_DOMAIN = ".quitboard.click"
+CSRF_COOKIE_DOMAIN = ".quitboard.click"
