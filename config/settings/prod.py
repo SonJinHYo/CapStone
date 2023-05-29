@@ -12,7 +12,7 @@ ALLOWED_HOSTS = [
     "quitboard.click",
 ]
 
-DEBUG = False
+DEBUG = True
 
 STORAGES = {
     "default": {"BACKEND": "config.storages.MediaStorage"},
@@ -48,10 +48,16 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = ["http://quitboard.click"]
-CSRF_TRUSTED_ORIGINS = ["http://quitboard.click"]
+CORS_ALLOWED_ORIGINS = ["http://quitboard.click",
+                        "ec2-43-200-248-130.ap-northeast-2.compute.amazonaws.com",
+                        ]
+
+# CSRF_TRUSTED_ORIGINS = ["http://quitboard.click",
+#                         "ec2-43-200-248-130.ap-northeast-2.compute.amazonaws.com",]
 
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_DOMAIN = ".quitboard.click"
-CSRF_COOKIE_DOMAIN = ".quitboard.click"
+# SESSION_COOKIE_DOMAIN = ".quitboard.click"
+# CSRF_COOKIE_DOMAIN = ".quitboard.click"
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None

@@ -81,7 +81,7 @@ class ViolationDetail(APIView):
         """
 
         try:
-            result = timezone.datetime.strptime(date_text, "%Y_%m_%d") 
+            result = timezone.datetime.strptime(date_text, "%Y-%m-%d") 
             return True
         except ValueError:
             return False
@@ -113,13 +113,13 @@ class ViolationDetail(APIView):
             )
             return Response(data=serializer.data, status=HTTP_200_OK)
 
-        elif kind == "time":  # detail : 연_월_일
+        elif kind == "time":  # detail : 연-월-일
             # DB를 살펴볼 필요가 없은 예외
             # 3개의 입력이 아니고, 연/월/일 입력이 유효하지 않은 날짜일 때,
             if not self.valid_date_input(detail):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
-            year, month, day = detail.split("_")
+            year, month, day = detail.split("-")
 
             serializer = ViolationInfoSerializer(
                 ViolationInfo.objects.filter(
