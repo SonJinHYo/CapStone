@@ -36,6 +36,7 @@ DEBUG = True
 THIRD_PARTY_APPS = [
     "rest_framework",
     "storages",
+    "django_extensions",
 ]
 
 CUSTOM_APPS = [
@@ -135,3 +136,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Auth
 AUTH_USER_MODEL = "users.User"
+
+# ERD
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
