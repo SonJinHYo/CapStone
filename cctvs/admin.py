@@ -44,14 +44,18 @@ def save_violation_data(filename,region,text):
         None
         
     """
+
     violation_list = [obj.name for obj in Violation.objects.all()]
     violations,time = text.split(',')
     v_set = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
     
     image_name,image_time = f'{filename[:-4]}.png',time[:time.find('T')]
     bucket,key = 'quit-board-bucket', f'images/{image_time}/{image_name}'
+		
+		# home경로의 aws key를 통해 s3버킷에 파일 업로드
     s3.upload_file(Filename=f'/srv/QuitBoard_Backend/tmp/images/{image_name}', Bucket=bucket, Key=key)
-    
+
+    # 업로드한 파일의 이미지 경로를 포함하여 위반객체(ViolationaInfo) 생성 후 One-to-Many관계(Violation-ViolationInfo) 추가
     v = ViolationInfo.objects.create(
         cctv = CCTV.objects.get(region=region),
         detected_time = time,
@@ -76,7 +80,9 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
     """
     try:
         with transaction.atomic():
+						# 선택된 zip파일 전체 조회
             for violation_file in violation_files.all():
+								# zip파일의 압축을 임시폴더로 "./tmp"에 풀어 위반 정보 조회
                 with violation_file.file.open() as zip_content:
                     with zipfile.ZipFile(zip_content,'r') as zip_ref:
                         zip_ref.extractall('/srv/QuitBoard_Backend/tmp')
@@ -84,9 +90,12 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
                     for filename in os.listdir(vio_dir):
                         with open(os.path.join(vio_dir, filename), 'r') as f:
                             content = f.read()
+														# 위반 사항이 있는 데이터는 데이터 저장 함수를 통해 저장
                             if int(content[:content.find(',')]) != 0:
                                 save_violation_data(filename,violation_file.cctv.region,content)
+										# 조회가 끝나면 임시 폴더 삭제
                     shutil.rmtree('/srv/QuitBoard_Backend/tmp')
+								# 업데이트가 끝난 데이터를 다시 조회하지 않도록 객체 삭제
                 violation_file.delete()
         return None
     except Exception:
