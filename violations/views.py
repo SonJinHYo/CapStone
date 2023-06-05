@@ -1,4 +1,7 @@
 from django.utils import timezone
+from datetime import datetime
+from django.utils.dateformat import DateFormat
+from django.core.cache import cache
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,9 +10,6 @@ from .serializers import ViolationInfoSerializer
 from .models import ViolationInfo, Violation
 from cctvs.models import CCTV
 from collections import defaultdict
-
-import datetime
-
 
 class AllViolations(APIView):
     """AllViolations APIView
@@ -34,23 +34,27 @@ class AllViolations(APIView):
                 - regionCountObj (_dict_): 각 지역별 위반 횟수
                 - detectedHourCountObj (_dict_): 시간대(시 단윈)별 위반 횟수
         """
-        violation_cnt, region_cnt, detected_hour_cnt = (
-            defaultdict(int),
-            defaultdict(int),
-            defaultdict(int),
-        )
+        today = DateFormat(datetime.now()).format('Ymd')
+        data = cache.get(today)
+        if data is None:
+            violation_cnt, region_cnt, detected_hour_cnt = (
+                defaultdict(int),
+                defaultdict(int),
+                defaultdict(int),
+            )
 
-        for violation_info in ViolationInfo.objects.all():
-            for violation in violation_info.__str__().split(","):
-                violation_cnt[violation] += 1
-            region_cnt[violation_info.cctv.region] += 1
-            detected_hour_cnt[violation_info.detected_time.hour] += 1
+            for violation_info in ViolationInfo.objects.all():
+                for violation in violation_info.__str__().split(","):
+                    violation_cnt[violation] += 1
+                region_cnt[violation_info.cctv.region] += 1
+                detected_hour_cnt[violation_info.detected_time.hour] += 1
 
-        data = {
-            "violationCountObj": violation_cnt,
-            "regionCountObj": region_cnt,
-            "detectedHourCountObj": detected_hour_cnt,
-        }
+            data = {
+                "violationCountObj": violation_cnt,
+                "regionCountObj": region_cnt,
+                "detectedHourCountObj": detected_hour_cnt,
+            }
+            cache.set(today,data,60*30)
 
         return Response(
             data,

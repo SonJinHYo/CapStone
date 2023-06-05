@@ -61,3 +61,11 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_DOMAIN = ".quitboard.click"
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+CACHES = {  
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379"
+        
+    }
+}

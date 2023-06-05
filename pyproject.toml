@@ -21,6 +21,7 @@ boto3 = "^1.26.126"
 django-storages = "^1.13.2"
 django-cors-headers = "^4.0.0"
 celery = {extras = ["redis"], version = "^5.2.7"}
+django-redis = "^5.2.0"
 
 
 [build-system]
