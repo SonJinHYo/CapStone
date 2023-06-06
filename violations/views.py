@@ -54,7 +54,8 @@ class AllViolations(APIView):
                 "regionCountObj": region_cnt,
                 "detectedHourCountObj": detected_hour_cnt,
             }
-            cache.set(today,data,60*30)
+            cache.set(today,data,60*60*3)
+            print("cache hit!")
 
         return Response(
             data,

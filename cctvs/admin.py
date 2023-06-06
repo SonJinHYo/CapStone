@@ -14,6 +14,8 @@ import zipfile
 import os
 import io
 
+from PIL import Image
+
 s3 = boto3.client('s3')
 
 @admin.register(CCTV)
