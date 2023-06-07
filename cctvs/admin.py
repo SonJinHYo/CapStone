@@ -12,6 +12,7 @@ import shutil
 import boto3
 import zipfile
 import os
+import imageio
 
 from PIL import Image
 
@@ -27,30 +28,32 @@ class CCTVAdmin(admin.ModelAdmin):
         "description",
     )
 
-def save_and_get_gif_address(image_dir:str) -> str:
-    """ 이미지 폴더 위치를 받아서 gif로 변환하는 함수
+def save_and_get_gif_address(dir_name:str) -> str:
+    """ 이미지 폴더 명을 받아서 gif파일 저장후 gif파일 주소를 변환하는 함수
     Args:
-        image_dir (str) : 이미지의 폴더 주소
+        target_dir (str) : gif파일로 만들 이미지가 들어있는 주소
         gif_address (str) : gif 이미지의 주소
         filename (str) : 이미지파일명 (ex. 0_0_114.jpg)
     Return:
         None
     """
     images = []
-    for filename in os.listdir(image_dir):
-        image_path = os.path.join(image_dir,filename)
+    target_dir = f'/srv/QuitBoard_Backend/tmp/images/{dir_name}'
+    gif_address = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}.gif"
+    for filename in sorted(os.listdir(target_dir)):
+        image_path = os.path.join(target_dir,filename)
         image = Image.open(image_path)
         images.append(image)
-        gif_address = f"/srv/QuitBoard_Backend/tmp/gif/{filename[:-4]}.gif"
         
-        images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
+    imageio.mimsave(gif_address, images, duration=100)
+    # images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
             
     return gif_address
 
 def save_violation_data(dir_name:str,region:str,text:str) -> None:
     """ DB에 위반정보를 저장하는 함수
     Args:
-        dir_name (str) : 위반이미지의 폴더명
+        dir_name (str) : 읽은 텍스트 파일과 같은 이름의 이미지 폴더
         region (str) : 위반 지역
         text (str) : 위반 사항과 위반 시간을 담은 문자열 (ex. text = 0010,2023-04-23T15:45:43)
         violation_list (list) : 현재 저장된 위반 사항
@@ -71,11 +74,11 @@ def save_violation_data(dir_name:str,region:str,text:str) -> None:
     v_set = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
     
     image_time = time[:time.find('T')]
-    gif_name = save_and_get_gif_address(f'/srv/QuitBoard_Backend/tmp/images/{dir_name}')
+    gif_file_address = save_and_get_gif_address(dir_name)
     bucket,key = 'quit-board-bucket', f'images/{image_time}/{dir_name}.gif'
 		
 	# home경로의 aws key를 통해 s3버킷에 파일 업로드
-    s3.upload_file(Filename=gif_name, Bucket=bucket, Key=key)
+    s3.upload_file(Filename=gif_file_address, Bucket=bucket, Key=key)
 
     # 업로드한 파일의 이미지 경로를 포함하여 위반객체(ViolationaInfo) 생성 후 One-to-Many관계(Violation-ViolationInfo) 추가
     v = ViolationInfo.objects.create(
