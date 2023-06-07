@@ -74,7 +74,7 @@ def save_violation_data(dir_name:str,region:str,text:str) -> None:
     
     image_time = time[:time.find('T')]
     gif_name = save_and_get_gif_url(dir_name)
-    bucket,key = 'quit-board-bucket', f'images/{image_time}/{dir_name}'
+    bucket,key = 'quit-board-bucket', f'images/{image_time}/{dir_name}.gif'
 		
 	# home경로의 aws key를 통해 s3버킷에 파일 업로드
     s3.upload_file(Filename=f'{gif_name}', Bucket=bucket, Key=key)
