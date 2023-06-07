@@ -45,7 +45,7 @@ def save_and_get_gif_address(dir_name:str) -> str:
         image = Image.open(image_path)
         images.append(image)
         
-    imageio.mimsave(gif_address, images, duration=100)
+    imageio.mimsave(gif_address, images, duration=100, loop=True)
     # images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
             
     return gif_address
