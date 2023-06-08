@@ -20,7 +20,7 @@ from PIL import Image
 s3 = boto3.client('s3')
 
 @shared_task
-def task_update_violations_data(violation_files):
+def task_save_violation_data(dir_name:str,region:str,text:str) -> None:
     def save_and_get_gif_address(dir_name:str) -> str:
         """ 이미지 폴더 명을 받아서 gif파일 저장후 gif파일 주소를 변환하는 함수
         Args:
@@ -42,7 +42,7 @@ def task_update_violations_data(violation_files):
         # images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
                 
         return gif_address
-    def save_violation_data(dir_name:str,region:str,text:str) -> None:
+    
         """ DB에 위반정보를 저장하는 함수
         Args:
             dir_name (str) : 읽은 텍스트 파일과 같은 이름의 이미지 폴더
@@ -60,58 +60,29 @@ def task_update_violations_data(violation_files):
             None
             
         """
-
-        violation_list = [obj.name for obj in Violation.objects.all()]
-        violations,time = text.split(',')
-        v_set = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
-        
-        image_time = time[:time.find('T')]
-        gif_file_address = save_and_get_gif_address(dir_name)
-        bucket,key = 'quit-board-bucket', f'images/{image_time}/{dir_name}.gif'
-            
-        # home경로의 aws key를 통해 s3버킷에 파일 업로드
-        s3.upload_file(Filename=gif_file_address, Bucket=bucket, Key=key)
-
-        # 업로드한 파일의 이미지 경로를 포함하여 위반객체(ViolationaInfo) 생성 후 One-to-Many관계(Violation-ViolationInfo) 추가
-        v = ViolationInfo.objects.create(
-            cctv = CCTV.objects.get(region=region),
-            detected_time = time,
-            img = f'https://{bucket}.s3.ap-northeast-2.amazonaws.com/{key}',
-        )
-        v.violations.set([obj for obj in Violation.objects.all() if obj.name in v_set])
-        
-        return None
-    """ zip파일 압축 해제 후 파싱하여 데이터를 저장하는 함수
     
-    Args:
-        ViolationFileAdmin (class) : 관리 객체
-        request (dict) : request 정보
-        violation_files (class) : 관리창에서 선택한 객체 쿼리. (zip 파일들)
-        vio_dir = 압축 해제 후 위반 정보가 저장된 폴더의 위치
+    violation_list = [obj.name for obj in Violation.objects.all()]
+    violations,time = text.split(',')
+    v_set = {violation_list[idx] for idx,i in enumerate(violations) if i=='1'}
     
-    Returns:
-        None
-    """
-    try:
-        with transaction.atomic():
-			# 선택된 zip파일 전체 조회
-            for violation_file in violation_files.all():
-				# zip파일의 압축을 임시폴더로 "./tmp"에 풀어 위반 정보 조회
-                with violation_file.file.open() as zip_content:
-                    with zipfile.ZipFile(zip_content,'r') as zip_ref:
-                        zip_ref.extractall('/srv/QuitBoard_Backend/tmp')
-                    vio_dir = '/srv/QuitBoard_Backend/tmp/violations'
-                    for filename in os.listdir(vio_dir):
-                        with open(os.path.join(vio_dir, filename), 'r') as f:
-                            content = f.read()
-							# 위반 사항이 있는 데이터는 데이터 저장 함수를 통해 저장
-                            if int(content[:content.find(',')]) != 0:
-                                # save_violation_data(filename,violation_file.cctv.region,content)
-                                save_violation_data(filename[:-4],violation_file.cctv.region,content)
-					# 조회가 끝나면 임시 폴더 삭제
-                    shutil.rmtree('/srv/QuitBoard_Backend/tmp')
-				# 업데이트가 끝난 데이터를 다시 조회하지 않도록 객체 삭제
-                violation_file.delete()
-        return None
-    except Exception:
-        raise exceptions.ParseError
+    image_time = time[:time.find('T')]
+    gif_file_address = save_and_get_gif_address(dir_name)
+    bucket,key = 'quit-board-bucket', f'images/{image_time}/{dir_name}.gif'
+        
+    # home경로의 aws key를 통해 s3버킷에 파일 업로드
+    s3.upload_file(Filename=gif_file_address, Bucket=bucket, Key=key)
+
+    # 업로드한 파일의 이미지 경로를 포함하여 위반객체(ViolationaInfo) 생성 후 One-to-Many관계(Violation-ViolationInfo) 추가
+    v = ViolationInfo.objects.create(
+        cctv = CCTV.objects.get(region=region),
+        detected_time = time,
+        img = f'https://{bucket}.s3.ap-northeast-2.amazonaws.com/{key}',
+    )
+    v.violations.set([obj for obj in Violation.objects.all() if obj.name in v_set])
+    
+    return None
+
+
+@shared_task
+def task_rm_zip(zip_address):
+    shutil.rmtree(zip_address)
