@@ -7,7 +7,9 @@ from .models import CCTV,ViolationFile
 from violations.models import ViolationInfo,Violation
 from violations.serializers import ViolationInfoSerializer
 from cctvs.models import CCTV
+# from .tasks import task_update_violations_data
 
+from celery import shared_task
 import shutil
 import boto3
 import zipfile
@@ -15,6 +17,8 @@ import os
 import imageio
 
 from PIL import Image
+
+
 
 s3 = boto3.client('s3')
 
@@ -130,7 +134,11 @@ def save_violation_data(dir_name:str,region:str,text:str) -> None:
 #     return None
 
 @admin.action(description="zip파일 업데이트 후 삭제")
-def update_violations_data(ViolationFileAdmin, request, violation_files):
+@shared_task
+def task_update_violations_data(ViolationFileAdmin, request, violation_files):
+    
+    # task_update_violations_data.delay(violation_files)
+    
     """ zip파일 압축 해제 후 파싱하여 데이터를 저장하는 함수
     
     Args:
@@ -168,7 +176,7 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
 
 @admin.register(ViolationFile)
 class ViolationFileAdmin(admin.ModelAdmin):
-    actions = [update_violations_data,]
+    actions = [task_update_violations_data,]
     list_display = (
         "file",
         "cctv", 
