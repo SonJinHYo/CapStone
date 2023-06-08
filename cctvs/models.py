@@ -37,7 +37,7 @@ class CCTV(models.Model):
 
     class Meta:
         verbose_name_plural = "CCTV 관리"
-        
+
 
 class ViolationFile(models.Model):
     """Video Model Description
@@ -47,8 +47,8 @@ class ViolationFile(models.Model):
     """
 
     file = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=['zip'])],
-        help_text = f"zip을 업로드하세요. zip파일 구조는 다음과 같아야 합니다. <br/>\
+        validators=[FileExtensionValidator(allowed_extensions=["zip"])],
+        help_text=f"zip을 업로드하세요. zip파일 구조는 다음과 같아야 합니다. <br/>\
         - filename.zip<br/>\
           &nbsp&nbsp&nbsp&nbsp- violations<br/>\
           &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 1.txt<br/>\
@@ -57,7 +57,7 @@ class ViolationFile(models.Model):
           &nbsp&nbsp&nbsp&nbsp- images<br/>\
           &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 1.png<br/>\
           &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp- 2.png<br/>\
-          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp:"
+          &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp:",
     )
 
     cctv = models.ForeignKey(
