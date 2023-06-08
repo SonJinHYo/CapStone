@@ -24,7 +24,9 @@ AWS_REGION = 'ap-northeast-2'
 AWS_STORAGE_BUCKET_NAME = 'quit-board-bucket'
 AWS_STATIC_LOCATION = 'static'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com'
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400',}
+AWS_S3_OBJECT_PARAMETERS = {
+    # 'CacheControl': 'max-age=86400',
+    }
 AWS_DEFAULT_ACL = 'public-read'
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
 STATICFILES_DIRS = [
@@ -62,6 +64,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
+#Cache
 CACHES = {  
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -69,3 +72,7 @@ CACHES = {
         
     }
 }
+
+# Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

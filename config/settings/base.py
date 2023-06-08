@@ -37,6 +37,9 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "storages",
     "django_extensions",
+        # celery setting
+    # 'django_celery_beat',
+    'django_celery_results',
 ]
 
 CUSTOM_APPS = [
