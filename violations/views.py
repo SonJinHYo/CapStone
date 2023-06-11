@@ -35,6 +35,8 @@ class AllViolations(APIView):
                 - regionCountObj (_dict_): 각 지역별 위반 횟수
                 - detectedHourCountObj (_dict_): 시간대(시 단윈)별 위반 횟수
         """
+
+        # cache hit 확인
         today = DateFormat(datetime.now()).format("Ymd")
         data = cache.get(today)
         if data is None:
@@ -157,16 +159,16 @@ class Choice(APIView):
         POST 요청을 처리하고, 요청 데이터의 'kind'(선택한 필터 종류) 따라 다른 Response를 반환.
 
         """
-        if kind == "violation":
-            response_data = [violation.name for violation in Violation.objects.all()]
-            return Response(response_data, status=HTTP_200_OK)
+        data = cache.get(kind)
+        if data is None:
+            if kind == "violation":
+                data = [violation.name for violation in Violation.objects.all()]
+                cache.set(kind, data, 60 * 60 * 24)
 
-        elif kind == "region":
-            response_data = [cctv.region for cctv in CCTV.objects.all()]
-            return Response(response_data, status=HTTP_200_OK)
+            elif kind == "region":
+                data = [cctv.region for cctv in CCTV.objects.all()]
 
-        elif kind == "time":
-            return Response(status=HTTP_200_OK)
+            else:
+                return Response(status=HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response(status=HTTP_400_BAD_REQUEST)
+        return Response(data, status=HTTP_200_OK)

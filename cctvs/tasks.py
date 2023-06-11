@@ -51,7 +51,7 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
             image = Image.open(image_path)
             images.append(image)
 
-        imageio.mimsave(gif_address, images, duration=100, loop=True)
+        imageio.mimsave(gif_address, images, **{"duration": 100, "loop": 0})
         # images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
 
         return gif_address
@@ -61,11 +61,15 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
     v_set = {violation_list[idx] for idx, i in enumerate(violations) if i == "1"}
 
     image_time = time[: time.find("T")]
+    jpg_file_address = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}/0002.jpg"
     gif_file_address = save_and_get_gif_address(dir_name)
     bucket, key = "quit-board-bucket", f"images/{image_time}/{dir_name}.gif"
 
     # home경로의 aws key를 통해 s3버킷에 파일 업로드
-    s3.upload_file(Filename=gif_file_address, Bucket=bucket, Key=key)
+    s3.upload_file(Filename=gif_file_address, Bucket=bucket, Key=key)  # gif 파일
+    s3.upload_file(
+        Filename=jpg_file_address, Bucket=bucket, Key=key[:-3] + "jpg"
+    )  # jpg 파일 (카드 메인 이미지)
 
     # 업로드한 파일의 이미지 경로를 포함하여 위반객체(ViolationaInfo) 생성 후 One-to-Many관계(Violation-ViolationInfo) 추가
     v = ViolationInfo.objects.create(
@@ -81,10 +85,3 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
 @shared_task
 def task_rm_zip(zip_address):
     shutil.rmtree(zip_address)
-
-
-@shared_task
-def task_admin_message(request, message):
-    from cctvs.admin import ViolationFileAdmin
-
-    ViolationFileAdmin.message_user(ViolationFileAdmin, request, message)
