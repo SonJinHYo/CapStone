@@ -11,6 +11,7 @@ from .models import ViolationInfo, Violation
 from cctvs.models import CCTV
 from collections import defaultdict
 
+
 class AllViolations(APIView):
     """AllViolations APIView
 
@@ -34,7 +35,7 @@ class AllViolations(APIView):
                 - regionCountObj (_dict_): 각 지역별 위반 횟수
                 - detectedHourCountObj (_dict_): 시간대(시 단윈)별 위반 횟수
         """
-        today = DateFormat(datetime.now()).format('Ymd')
+        today = DateFormat(datetime.now()).format("Ymd")
         data = cache.get(today)
         if data is None:
             violation_cnt, region_cnt, detected_hour_cnt = (
@@ -54,7 +55,7 @@ class AllViolations(APIView):
                 "regionCountObj": region_cnt,
                 "detectedHourCountObj": detected_hour_cnt,
             }
-            cache.set(today,data,60*60*3)
+            cache.set(today, data, 60 * 60 * 24)
             print("cache hit!")
 
         return Response(
@@ -86,7 +87,7 @@ class ViolationDetail(APIView):
         """
 
         try:
-            result = timezone.datetime.strptime(date_text, "%Y-%m-%d") 
+            result = timezone.datetime.strptime(date_text, "%Y-%m-%d")
             return True
         except ValueError:
             return False

@@ -5,13 +5,10 @@ from rest_framework import exceptions
 
 from .models import CCTV, ViolationFile
 from cctvs.models import CCTV
-from .tasks import task_save_violation_data, task_rm_zip
+from .tasks import task_admin_message, task_rm_zip, task_save_violation_data
 
-import boto3
 import zipfile
 import os
-
-s3 = boto3.client("s3")
 
 
 @admin.register(CCTV)
@@ -38,7 +35,9 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
     Returns:
         None
     """
+
     try:
+        task_admin_message(request, "파일 업데이트를 시작합니다.")
         with transaction.atomic():
             # 선택된 zip파일 전체 조회
             for violation_file in violation_files.all():
@@ -60,7 +59,9 @@ def update_violations_data(ViolationFileAdmin, request, violation_files):
                     # 조회가 끝나면 임시 폴더 삭제
                     task_rm_zip.delay("/srv/QuitBoard_Backend/tmp")
         # 업데이트가 끝난 데이터를 다시 조회하지 않도록 객체 삭제
-        # violation_file.delete()
+        violation_file.delete()
+        # task_admin_message(request, "파일 업데이트를 완료하였습니다.")
+
         return None
     except Exception:
         raise exceptions.ParseError

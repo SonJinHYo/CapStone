@@ -42,6 +42,7 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
         Return:
             None
         """
+
         images = []
         target_dir = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}"
         gif_address = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}.gif"
@@ -80,3 +81,10 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
 @shared_task
 def task_rm_zip(zip_address):
     shutil.rmtree(zip_address)
+
+
+@shared_task
+def task_admin_message(request, message):
+    from cctvs.admin import ViolationFileAdmin
+
+    ViolationFileAdmin.message_user(ViolationFileAdmin, request, message)
