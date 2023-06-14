@@ -1,6 +1,5 @@
 from .models import CCTV
 from violations.models import ViolationInfo, Violation
-from cctvs.models import CCTV
 from celery import shared_task
 
 import shutil

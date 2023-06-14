@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.prod")
@@ -16,6 +17,13 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+
+app.conf.beat_schedule = {
+    "check_s3_zip_dir": {
+        "task": "cctvs.tasks.check_zip_dir",
+        "schedule": crontab(minute="*/5"),
+    }
+}
 
 
 @app.task(bind=True, ignore_result=True)

@@ -25,6 +25,7 @@ django-redis = "^5.2.0"
 pillow = "^9.5.0"
 imageio = "^2.31.0"
 django-celery-results = "^2.5.1"
+django-celery-beat = "^2.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
