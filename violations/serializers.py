@@ -1,6 +1,5 @@
-from rest_framework.serializers import ModelSerializer,SerializerMethodField
-from .models import ViolationInfo, Violation
-
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from .models import ViolationInfo
 
 
 class ViolationInfoSerializer(ModelSerializer):
@@ -9,16 +8,16 @@ class ViolationInfoSerializer(ModelSerializer):
     violation_list = SerializerMethodField()
     region = SerializerMethodField()
     date = SerializerMethodField()
-    
-    def get_violation_list(self,obj):
+
+    def get_violation_list(self, obj):
         return [violation.name for violation in obj.violations.all()]
-        
-    def get_region(self,obj):
+
+    def get_region(self, obj):
         return obj.cctv.region
-    
-    def get_date(self,obj):
+
+    def get_date(self, obj):
         return obj.detected_time.date()
-    
+
     class Meta:
         model = ViolationInfo
         fields = (

@@ -172,3 +172,25 @@ class Choice(APIView):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
         return Response(data, status=HTTP_200_OK)
+
+
+class SaveViolationInfo(APIView):
+    def post(self, request):
+        data = request.data
+
+        try:
+            v = ViolationInfo.objects.create(
+                cctv=CCTV.objects.get(region=data["region"]),
+                detected_time=data["detected_time"],
+                img=data["image"],
+            )
+            v.violations.set(
+                [
+                    obj
+                    for obj in Violation.objects.all()
+                    if obj.name in data["violations"]
+                ]
+            )
+            return Response(status=HTTP_201_CREATED)
+        except:
+            return Response(status=HTTP_400_BAD_REQUEST)

@@ -9,4 +9,5 @@ urlpatterns = [
         views.ViolationDetail.as_view(),
         name="violation_detail",
     ),
+    path("create", views.SaveViolationInfo.as_view(), name="create_violationInfo"),
 ]
