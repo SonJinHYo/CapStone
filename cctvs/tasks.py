@@ -6,10 +6,43 @@ import shutil
 import boto3
 import os
 import imageio
-
+import zipfile
 from PIL import Image
 
 s3 = boto3.client("s3")
+s3_resource = boto3.resource("s3")
+
+
+def save_and_get_images_address(dir_name: str) -> str:
+    """이미지 폴더 명을 받아서 gif파일 저장후 gif파일 주소를 변환하는 함수
+    Args:
+        target_dir (str) : gif파일로 만들 이미지가 들어있는 주소
+        gif_address (str) : gif 이미지의 주소
+        filename (str) : 이미지파일명 (ex. 0_0_114.jpg)
+    Return:
+        None
+    """
+
+    images = []
+    image_nums = []
+    target_dir = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}"
+    gif_address = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}.gif"
+
+    for filename in sorted(os.listdir(target_dir)):
+        image_nums.append(int(filename[:-4]))
+
+        image_path = os.path.join(target_dir, filename)
+        image = Image.open(image_path)
+        images.append(image)
+
+    imageio.mimsave(gif_address, images, **{"duration": 100, "loop": 0})
+
+    middle_image_file = str(len(images) // 2 * 3 - 1).zfill(4) + ".jpg"
+    jpg_file_address = (
+        f"/srv/QuitBoard_Backend/tmp/images/{dir_name}/{middle_image_file}"
+    )
+
+    return jpg_file_address, gif_address
 
 
 @shared_task
@@ -31,38 +64,6 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
         None
 
     """
-
-    def save_and_get_images_address(dir_name: str) -> str:
-        """이미지 폴더 명을 받아서 gif파일 저장후 gif파일 주소를 변환하는 함수
-        Args:
-            target_dir (str) : gif파일로 만들 이미지가 들어있는 주소
-            gif_address (str) : gif 이미지의 주소
-            filename (str) : 이미지파일명 (ex. 0_0_114.jpg)
-        Return:
-            None
-        """
-
-        images = []
-        image_nums = []
-        target_dir = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}"
-        gif_address = f"/srv/QuitBoard_Backend/tmp/images/{dir_name}.gif"
-
-        for filename in sorted(os.listdir(target_dir)):
-            image_nums.append(int(filename[:-4]))
-
-            image_path = os.path.join(target_dir, filename)
-            image = Image.open(image_path)
-            images.append(image)
-
-        imageio.mimsave(gif_address, images, **{"duration": 100, "loop": 0})
-
-        middle_image_file = str(len(images) // 2 * 3 - 1).zfill(4) + ".jpg"
-        jpg_file_address = (
-            f"/srv/QuitBoard_Backend/tmp/images/{dir_name}/{middle_image_file}"
-        )
-        # images[0].save(gif_address, save_all=True, append_images=images[1:], duration=100, loop=0)
-
-        return jpg_file_address, gif_address
 
     violation_list = [obj.name for obj in Violation.objects.all()]
     violations, time = text.split(",")
@@ -92,3 +93,33 @@ def task_save_violation_data(dir_name: str, region: str, text: str) -> None:
 @shared_task
 def task_rm_zip(zip_address):
     shutil.rmtree(zip_address)
+
+
+@shared_task
+def check_zip_dir():
+    bucket = "quit-board-bucket"
+    obj_list = s3.list_objects(Bucket=bucket, Prefix="zip_dir/")
+    contents = obj_list["Contents"]
+
+    for content in contents:
+        key = content["Key"]
+        zip_file = s3_resource.Object(bucket, key)
+        with zip_file.open() as zip_content:
+            with zipfile.ZipFile(zip_content, "r") as zip_ref:
+                zip_ref.extractall("/srv/QuitBoard_Backend/tmp")
+                vio_dir = "/srv/QuitBoard_Backend/tmp/violations"
+                for filename in os.listdir(vio_dir):
+                    with open(os.path.join(vio_dir, filename), "r") as f:
+                        content = f.read()
+                        # 위반 사항이 있는 데이터는 데이터 저장 함수를 통해 저장
+                        if int(content[: content.find(",")]) != 0:
+                            task_save_violation_data.delay(
+                                filename[:-4],
+                                # violation_file.cctv.region,
+                                content,
+                            )
+                # 조회가 끝나면 임시 폴더 삭제
+                task_rm_zip.delay("/srv/QuitBoard_Backend/tmp")
+        # 업데이트가 끝난 데이터를 다시 조회하지 않도록 객체 삭제
+        # violation_file.delete()
+        # task_admin_message(request, "파일 업데이트를 완료하였습니다.")
