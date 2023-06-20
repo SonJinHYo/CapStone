@@ -121,5 +121,5 @@ def check_zip_dir():
                 # 조회가 끝나면 임시 폴더 삭제
                 task_rm_zip.delay("/srv/QuitBoard_Backend/tmp")
         # 업데이트가 끝난 데이터를 다시 조회하지 않도록 객체 삭제
-        # violation_file.delete()
+        violation_file.delete()
         # task_admin_message(request, "파일 업데이트를 완료하였습니다.")
