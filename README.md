@@ -42,6 +42,8 @@ cctv영상을 통해 전동스쿠터와 관련된 여러 위반 사항을 감지
 - MySQL
   - DB모델 자체가 단순하고 데이터의 누락 가능성이 적은 정형데이터이기 때문에 관계형 데이터베이스를 선택
 
+**cooperatot**
+- git, notion
 
 
 # ERD
@@ -72,6 +74,8 @@ cctv영상을 통해 전동스쿠터와 관련된 여러 위반 사항을 감지
 | *      | {aws_ec2_domain}/admin      | django관리자 페이지                                  |
 
 
+# 성과
+- 웹페이지 : www.quitboard.click
 
 # 개선사항
 
