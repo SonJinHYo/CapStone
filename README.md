@@ -49,7 +49,7 @@ cctv영상을 통해 전동스쿠터와 관련된 여러 위반 사항을 감지
 # ERD
 
 위반 데이터 정보를 공공으로 제공하는 것을 목적으로 했기에 단순한 구조의 DB모델을 가지고 있습니다.
-
+![erd](https://github.com/SonJinHYo/image_repo/blob/main/image_server/erd.png)
 ### Tabel
 
 - violation : 위반 항목을 저장합니다. 규정이 변화하더라도 대응할 수 있도록 수정가능하게 관리하도록 합니다.
